@@ -1,0 +1,23 @@
+{
+  "name": "itowns-demo-3dtiles",
+  "version": "1.0.0",
+  "description": "A demonstrator for showing IGN 3d tiles data",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack serve",
+    "watch": "webpack --watch"
+  },
+  "author": "IGN - DSTI - SDM",
+  "license": "ISC",
+  "devDependencies": {
+    "webpack": "^5.78.0",
+    "webpack-cli": "^5.0.1",
+    "webpack-dev-server": "^4.13.2"
+  },
+  "dependencies": {
+    "buffer": "^6.0.3",
+    "html-loader": "^4.2.0",
+    "itowns": "^2.39.1-next.20"
+  }
+}

@@ -1,0 +1,45 @@
+html, body {
+    margin: 0;
+}
+
+#viewerDiv {
+    height: 100vh;
+}
+
+#menuDiv {
+    position: absolute;
+    top: 0;
+    left: 30px;
+    z-index: 10;
+}
+
+#custom-widget {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+
+    width: 300px;
+    height: 100px;
+
+    background-color: blue;
+}
+
+#custom-widget > div > div {
+    display: flex;
+}
+
+#custom-widget > div > div > * {
+    flex-basis: 50%;
+}
+
+#custom-widget > div > div > *:last-child {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#custom-widget input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
