@@ -1,30 +1,58 @@
 import * as itowns from 'itowns';
+import * as three from 'three';
 import * as widgets from 'itowns/widgets';
-
-import { CustomWidget } from './widgets/CustomWidget';
+import { C3DTilesBboxLayer } from './utils/C3DTilesBboxLayer';
+import { LayerOptionsWidget } from './widgets/LayerOptions/LayerOptions.js';
+import { LoadingScreen } from './widgets/LoadingScreen/LoadingScreen.js';
+import { processUrl } from './utils/Source';
+import foldButton from './template-fold-button.html';
 
 
 
 // ---------- CREATE A GlobeView FOR SUPPORTING DATA VISUALIZATION : ----------
 
-// Define camera initial position
-const placement = {
-    coord: new itowns.Coordinates('EPSG:4326', 0.71667, 45.183331, 0),
-    range: 4000,
-    tilt: 30,
-}
-
-// `viewerDiv` will contain iTowns' rendering area (`<canvas>`)
-const viewerDiv = document.getElementById('viewerDiv');
-
-// Create a GlobeView
-const view = new itowns.GlobeView(viewerDiv, placement);
-
-const debugMenu = new GuiTools('menuDiv', view);
+const view = new itowns.GlobeView(
+    document.getElementById('viewerDiv'),
+    {
+        coord: new itowns.Coordinates('EPSG:4326', 0.71667, 45.183331, 0),
+        range: 4000,
+        tilt: 30,
+    },
+);
+view.mainLoop.gfxEngine.renderer.outputEncoding = three.sRGBEncoding;
 
 
-const foo = new CustomWidget(view);
-foo.domElement.id = 'custom-widget';
+
+// ---------- ADD SOME WIDGETS : ----------
+
+// Navigation widget
+const navigation = new widgets.Navigation(view, {
+    position: 'bottom-right',
+});
+
+// Loading screen widget
+const loadingScreen = new LoadingScreen(view);
+loadingScreen.hideOn(view, itowns.GLOBE_VIEW_EVENTS.GLOBE_INITIALIZED);
+
+// Layer options widget
+const layerOptions = new LayerOptionsWidget(view);
+layerOptions.addLayer(view.tileLayer, { wireframe: false, });
+
+// Customize layer options widget
+layerOptions.domElement.insertBefore(
+    Object.assign(
+        Object.assign(
+            document.createElement('div'),
+            { innerHTML: foldButton },
+        ).querySelector('#folder'),
+        { onclick: () => {
+            layerOptions.domElement.classList.toggle('folded');
+        } },
+    ),
+    layerOptions.domElement.firstChild,
+);
+
+
 
 // ---------- DISPLAY CONTEXTUAL DATA - ORTHO IMAGES AND DEM : ----------
 
@@ -33,8 +61,7 @@ itowns.Fetcher.json('./resources/layers/Ortho.json')
         config.source = new itowns.WMTSSource(config.source);
         view.addLayer(
             new itowns.ColorLayer(config.id, config),
-        ).then((l) => { foo.addLayer(l) });
-        // ).then(debugMenu.addLayerGUI.bind(debugMenu));
+        );
     });
 
 itowns.Fetcher.json('./resources/layers/IGN_MNT_HIGHRES.json')
@@ -42,7 +69,7 @@ itowns.Fetcher.json('./resources/layers/IGN_MNT_HIGHRES.json')
         config.source = new itowns.WMTSSource(config.source);
         view.addLayer(
             new itowns.ElevationLayer(config.id, config),
-        ).then(debugMenu.addLayerGUI.bind(debugMenu));
+        );
     });
 
 
@@ -51,30 +78,35 @@ itowns.Fetcher.json('./resources/layers/IGN_MNT_HIGHRES.json')
 
 let index = 0;
 
-function add3dTilesLayer(url) {
+function add3dTilesLayer(url, options = {}) {
+    index++;
+
+    options.source = new itowns.C3DTilesSource({ url });
+
     itowns.View.prototype.addLayer.call(
         view,
-        new itowns.C3DTilesLayer(`Tile-${index}`, {
-            name: 'Tile',
-            source: new itowns.C3DTilesSource({ url }),
-        }, view),
-    );
-    index++;
+        new itowns.C3DTilesLayer(
+            options.name || `Tile-${index}`,
+            options,
+            view
+        ),
+    ).then((layer) => {
+        itowns.View.prototype.addLayer.call(
+            view,
+            new C3DTilesBboxLayer(layer),
+            layer,
+        );
+
+        layerOptions.addLayer(layer);
+    });
 }
 
-add3dTilesLayer('resources/dataset1/tileset.json');
-// add3dTilesLayer('resources/dataset2/Tile_p020_p027/Tile_p020_p027.json');
-// add3dTilesLayer('resources/dataset2/Tile_p020_p027/Tile_p020_p027_L19_00001.json');
-// add3dTilesLayer('resources/dataset3/Production_PCRSonly.json');
-
-
-
-// ---------- ADD SOME WIDGETS : ----------
-
-const navigation = new widgets.Navigation(view, {
-    position: 'bottom-right',
-});
-
-
-
+const datasetUrl = new URLSearchParams(window.location.search).get('dataset');
+if (datasetUrl) {
+    processUrl(datasetUrl).then((datasetArray) => {
+        datasetArray.forEach((dataset) => {
+            add3dTilesLayer(dataset.url, dataset.options);
+        });
+    });
+}
 

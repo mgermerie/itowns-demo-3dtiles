@@ -1,0 +1,15 @@
+{
+  "dataset1": {
+    "url": "http://localhost:8083/perigueux-soi/tileset.json",
+    "options": {
+      "name": "Dataset SOI",
+      "sseThreshold": 0
+    }
+  },
+  "dataset2": {
+    "url": "http://localhost:8083/perigueux-rdi/tileset.json",
+    "options": {
+      "name": "Dataset RDI"
+    }
+  }
+}

@@ -1,0 +1,63 @@
+:root {
+    --widget-background-color: #313336bb;
+    --widget-border-color: #222222;
+}
+
+/**************************** Layer options widget ****************************/
+
+.layer-options-widget {
+    background-color: var(--widget-background-color);
+    border: 1px solid var(--widget-border-color);
+    border-left: none;
+    border-radius: 0 7px 7px 0;
+    box-sizing: border-box;
+    color: white;
+    font-family: Arial;
+    left: 0;
+    position: absolute;
+    top: 10px;
+    transition: left .5s;
+    width: 250px;
+    z-index: 10;
+}
+.layer-options-widget > div:first-of-type > p {
+    border-top-right-radius: 7px;
+}
+.layer-options-widget > div:not(:last-child) {
+    border-bottom: 2px solid var(--widget-border-color);
+}
+.layer-options-widget > div > p {
+    background-color: var(--widget-border-color);
+    margin: 0;
+    padding: 6px 0;
+    text-align: center;
+}
+.layer-options-widget > div > div {
+    display: flex;
+}
+.layer-options-widget > div > div:not(:last-child) {
+    border-bottom: 1px solid var(--widget-border-color);
+}
+.layer-options-widget > div > div > * {
+    box-sizing: border-box;
+    flex-basis: 50%;
+}
+.layer-options-widget > div > div > *:first-child {
+    padding-left: 15px;
+}
+.layer-options-widget > div > div > p {
+    margin: 6px 0;
+}
+.layer-options-widget > div > div > *:last-child {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    padding-right: 15px;
+}
+.layer-options-widget input[type="checkbox"] {
+    height: 20px;
+    width: 20px;
+}
+.layer-options-widget input[type="range"] {
+    width: 80%;
+}

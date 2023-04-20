@@ -8,12 +8,20 @@ module.exports = {
       {
         test: /\.html$/i,
         loader: 'html-loader',
+     },
+      {
+        test: /\.css$/,
+        use: [{ loader: 'style-loader' }, { loader: 'css-loader' }],
       },
     ],
   },
   output: {
-    filename: 'main.js',
     path: path.resolve(__dirname, 'public/js'),
+    filename: 'main.js',
+    publicPath: '/js/',
+  },
+  devServer: {
+    watchFiles: ['src/*'],
   },
   devtool: 'source-map',
 };

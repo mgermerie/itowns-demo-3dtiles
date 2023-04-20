@@ -17,7 +17,9 @@
   },
   "dependencies": {
     "buffer": "^6.0.3",
+    "css-loader": "^6.7.4",
     "html-loader": "^4.2.0",
-    "itowns": "^2.39.1-next.20"
+    "itowns": "^2.39.1-next.20",
+    "style-loader": "^3.3.3"
   }
 }
