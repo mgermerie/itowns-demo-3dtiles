@@ -4,9 +4,10 @@
   "description": "A demonstrator for showing IGN 3d tiles data",
   "main": "index.js",
   "scripts": {
+    "build": "ENVIRONMENT=production webpack",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack serve",
-    "watch": "webpack --watch"
+    "start": "ENVIRONMENT=development webpack serve",
+    "watch": "ENVIRONMENT=development webpack --watch"
   },
   "author": "IGN - DSTI - SDM",
   "license": "ISC",

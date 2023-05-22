@@ -1,7 +1,8 @@
 const path = require('path');
+const mode = process.env.ENVIRONMENT;
 
 module.exports = {
-  mode: 'development',
+  mode,
   entry: './src/index.js',
   module: {
     rules: [

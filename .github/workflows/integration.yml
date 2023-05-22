@@ -1,0 +1,55 @@
+on:
+  push:
+    branch:
+      - master
+  workflow_dispatch: {}
+
+name: integration
+
+jobs:
+  build:
+    name: Build website
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - name: use Node.js 16.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.16.x
+
+      - name: install packages
+        run: npm ci
+
+      - name: build website
+        run: npm run build
+
+      - name: archive production artifacts
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: public-website
+          path: public
+
+  deploy:
+    name: deploy to itowns-demo-3dtiles-public
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+
+      - name: download artifacts from build
+        uses: actions/download-artifact@v3
+        with:
+          name: public-website
+          path: public
+
+      - name: push to itowns-demo-3dtiles-public
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          deploy_key: ${{ secrets.SSH_DEPLOY_KEY }}
+          external_repository: mgermerie/itowns-demo-3dtiles-public
+          publish_dir: ./public
+          publish_branch: master
+          disable_nojekyll: true
+
