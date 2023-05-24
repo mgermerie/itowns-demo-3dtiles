@@ -46,25 +46,19 @@ export class LayerOptionsWidget extends Widget {
         layerDomName.innerHTML = `${layer.name || layer.id}`;
         layerDom.appendChild(layerDomName);
 
-        if (layer.isColorLayer) {
+        if (layer.isTiledGeometryLayer) {
+            this.#addVisibilityToggle(layerDom, layer, options.visibility);
+            this.#addWireframeToggle(layerDom, layer, options.wireframe);
+        } else if (layer.isColorLayer) {
             this.#addVisibilityToggle(layerDom, layer, options.visibility);
             this.#addOpacitySlider(layerDom, layer, options.opacity);
-        } else if (layer.isElevationLayer) {
-            // do
         } else if (layer.isC3DTilesLayer) {
             this.#addVisibilityToggle(layerDom, layer, options.visibility);
             this.#addOpacitySlider(layerDom, layer, options.opacity);
             this.#addWireframeToggle(layerDom, layer, options.wireframe);
-        } else if (layer.isTiledGeometryLayer) {
-            this.#addVisibilityToggle(layerDom, layer, options.visibility);
-            this.#addWireframeToggle(layerDom, layer, options.wireframe);
-        }
+            this.#addSSEThresholdSlider(layerDom, layer, options.sseThreshold);
 
-
-        // Bounding boxes and wireframe toggle
-        if (
-            layer.isC3DTilesLayer
-        ) {
+            // Bounding boxes and wireframe toggle
             const obbLayer = layer.attachedLayers
                 .filter(l => l.id === `${layer.id}-obb`)[0];
             if (obbLayer) {
@@ -90,6 +84,7 @@ export class LayerOptionsWidget extends Widget {
 
     #addVisibilityToggle(parentDomElement, layer, enabled = true) {
         if (!enabled) { return; }
+
         parentDomElement.appendChild(this.#bindLayerInput(
             this.#getElement('visibility'),
             (value) => {
@@ -101,6 +96,7 @@ export class LayerOptionsWidget extends Widget {
 
     #addOpacitySlider(parentDomElement, layer, enabled = true) {
         if (!enabled) { return; }
+
         parentDomElement.appendChild(this.#bindLayerInput(
             this.#getElement('opacity'),
             (value) => {
@@ -112,11 +108,30 @@ export class LayerOptionsWidget extends Widget {
 
     #addWireframeToggle(parentDomElement, layer, enabled = true) {
         if (!enabled) { return; }
+
         parentDomElement.appendChild(this.#bindLayerInput(
             this.#getElement('wireframe'),
             (value) => {
                 layer.wireframe = value;
                 this.#view.notifyChange(layer);
+            },
+        ));
+    }
+
+    #addSSEThresholdSlider(parentDomElement, layer, enabled = true) {
+        if (!enabled) { return; }
+        // TODO : is this check realy necessary ?
+        if (layer.sseThreshold === undefined) { return; }
+
+        // Initialize slider value from layer property
+        const sseThresholdSlider = this.#getElement('sse-threshold');
+        sseThresholdSlider.querySelector('input').value = layer.sseThreshold;
+
+        parentDomElement.appendChild(this.#bindLayerInput(
+            this.#getElement('sse-threshold'),
+            (value) => {
+                layer.sseThreshold = value;
+                this.#view.notifyChange(this.#view.camera.camera3D);
             },
         ));
     }
