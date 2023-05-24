@@ -4,7 +4,7 @@ import loadingScreenInnerHTML
 
 
 const DEFAULT_OPTIONS = {
-    hidingTimeout: 3000,
+    hidingTimeout: 10000,
 }
 
 
