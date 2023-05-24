@@ -11,5 +11,12 @@
     "options": {
       "name": "Dataset RDI"
     }
+  },
+  "dataset3": {
+    "url": "http://localhost:8083/test/tileset.json",
+    "options": {
+      "name": "Dataset test",
+      "sseThreshold": 0
+    }
   }
 }
