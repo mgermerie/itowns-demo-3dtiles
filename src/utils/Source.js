@@ -4,41 +4,55 @@ import * as itowns from 'itowns';
 function isValidUrl (urlString) {
     try {
         return Boolean(new URL(urlString));
-    } 
-    catch (e) {
+    } catch (e) {
         return false;
     }
 }
 
 
-export async function processUrl(datasetUrl) {
-    const urlArray = [];
+export async function processUrl(datasetUrl, dataServerConfig) {
+    const datasetsArray = [];
 
     let registeredDatasets;
 
-    for (const url of datasetUrl.split(',')) {
-        if (isValidUrl(url)) {
-            urlArray.push({ url });
+    for (const key of datasetUrl.split(',')) {
+        if (isValidUrl(key)) {
+            datasetsArray.push({ url: key });
             continue;
         }
 
-        if (!registeredDatasets) {
-            registeredDatasets = await itowns.Fetcher.json(
-                './resources/known_datasets.json',
-            );
+        // Try to fetch config file from server, and skip the loop step if
+        // fetching it already failed.
+        if (registeredDatasets === false) {
+            continue;
+        } else if (registeredDatasets === undefined) {
+            try {
+                registeredDatasets = await itowns.Fetcher.json(
+                    `${dataServerConfig.baseUrl}/${dataServerConfig.configFile}`,
+                );
+            } catch (e) {
+                registeredDatasets = false;
+                continue;
+            }
         }
-        
-        if (!registeredDatasets[url]) {
+
+        if (!registeredDatasets[key]) {
             console.warn(
-                `Dataset key "${url}" is unknown. Please check the`
-                + ` dataset keys list.`
+                `Dataset key "${key}" is unknown. Please check the`
+                + ` dataset keys list on the data server.`
             );
             continue;
         }
 
-        urlArray.push(registeredDatasets[url]);
+
+        if (!isValidUrl(registeredDatasets[key].url)) {
+            registeredDatasets[key].url =
+                `${dataServerConfig.baseUrl}/${registeredDatasets[key].url}`;
+        }
+
+        datasetsArray.push(registeredDatasets[key]);
     }
 
-    return Promise.resolve(urlArray);
+    return Promise.resolve(datasetsArray);
 }
 

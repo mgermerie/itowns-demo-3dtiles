@@ -8,6 +8,9 @@ import { processUrl } from './utils/Source';
 import foldButton from './template-fold-button.html';
 
 
+const DATA_SERVER_URL = 'http://10.128.35.64';
+const DATA_SERVER_CONFIG_FILE = 'config.json'
+
 
 // ---------- CREATE A GlobeView FOR SUPPORTING DATA VISUALIZATION : ----------
 
@@ -56,21 +59,23 @@ layerOptions.domElement.insertBefore(
 
 // ---------- DISPLAY CONTEXTUAL DATA - ORTHO IMAGES AND DEM : ----------
 
-itowns.Fetcher.json('./resources/layers/Ortho.json')
-    .then((config) => {
-        config.source = new itowns.WMTSSource(config.source);
-        view.addLayer(
-            new itowns.ColorLayer(config.id, config),
-        );
-    });
+itowns.Fetcher.json(
+    './resources/layers/Ortho.json'
+).then((config) => {
+    config.source = new itowns.WMTSSource(config.source);
+    view.addLayer(
+        new itowns.ColorLayer(config.id, config),
+    );
+});
 
-itowns.Fetcher.json('./resources/layers/IGN_MNT_HIGHRES.json')
-    .then((config) => {
-        config.source = new itowns.WMTSSource(config.source);
-        view.addLayer(
-            new itowns.ElevationLayer(config.id, config),
-        );
-    });
+itowns.Fetcher.json(
+    './resources/layers/IGN_MNT_HIGHRES.json'
+).then((config) => {
+    config.source = new itowns.WMTSSource(config.source);
+    view.addLayer(
+        new itowns.ElevationLayer(config.id, config),
+    );
+});
 
 
 
@@ -103,7 +108,13 @@ function add3dTilesLayer(url, options = {}) {
 
 const datasetUrl = new URLSearchParams(window.location.search).get('dataset');
 if (datasetUrl) {
-    processUrl(datasetUrl).then((datasetArray) => {
+    processUrl(
+        datasetUrl,
+        {
+            baseUrl: DATA_SERVER_URL,
+            configFile: DATA_SERVER_CONFIG_FILE,
+        },
+    ).then((datasetArray) => {
         datasetArray.forEach((dataset) => {
             add3dTilesLayer(dataset.url, dataset.options);
         });
