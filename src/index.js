@@ -8,7 +8,8 @@ import { processUrl } from './utils/Source';
 import foldButton from './template-fold-button.html';
 
 
-const DATA_SERVER_URL = 'http://10.128.35.64';
+// const DATA_SERVER_URL = 'http://10.128.35.64';
+const DATA_SERVER_URL = './resources/3dTiles';
 const DATA_SERVER_CONFIG_FILE = 'config.json'
 
 
@@ -115,6 +116,7 @@ if (datasetUrl) {
             configFile: DATA_SERVER_CONFIG_FILE,
         },
     ).then((datasetArray) => {
+        itowns.enableDracoLoader('./resources/libs/draco/');
         datasetArray.forEach((dataset) => {
             add3dTilesLayer(dataset.url, dataset.options);
         });
